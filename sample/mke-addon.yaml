@@ -1,0 +1,33 @@
+apiVersion: mke.mirantis.com/v1alpha1
+kind: MkeAddon
+metadata:
+  name: mkeaddon-example-server
+spec:
+  name: example-server
+  kind: MKEAddon
+  enabled: true
+  namespace: default
+  chart:
+    name: nginx
+    repo: https://charts.bitnami.com/bitnami
+    version: 15.1.1
+    values: |2
+      "service":
+        "type": "ClusterIP"
+---
+apiVersion: mke.mirantis.com/v1alpha1
+kind: MkeAddon
+metadata:
+  name: mkeaddon-grafana
+spec:
+  name: my-grafana
+  enabled: true
+  kind: MKEAddon
+  namespace: monitoring
+  chart:
+    name: grafana
+    repo: https://grafana.github.io/helm-charts
+    version: 6.58.7
+    values: |
+      ingress:
+        enabled: true

@@ -1,0 +1,46 @@
+apiVersion: mke.mirantis.com/v1alpha1
+kind: MkeCluster
+metadata:
+  labels:
+    app.kubernetes.io/name: mkecluster
+    app.kubernetes.io/instance: mkecluster-sample
+    app.kubernetes.io/part-of: mke-operator
+    app.kubernetes.io/created-by: mke-operator
+  name: mkecluster-sample
+spec:
+  components:
+    core:
+      ingress:
+        enabled: true
+        provider: ingress-nginx
+        config: |
+          controller:
+            service:
+              nodePorts:
+                http: 30000
+                https: 30001
+              type: NodePort
+    addons:
+      - name: my-grafana
+        kind: MKEAddon
+        enabled: true
+        namespace: monitoring
+        chart:
+          name: grafana
+          repo: https://grafana.github.io/helm-charts
+          version: 6.58.7
+          values: |
+            ingress:
+              enabled: true
+            - name: example-server
+      - name: mkeaddon-example-server
+        kind: MKEAddon
+        enabled: true
+        namespace: default
+        chart:
+          name: nginx
+          repo: https://charts.bitnami.com/bitnami
+          version: 15.1.1
+          values: |
+            service:
+              type: NodePort

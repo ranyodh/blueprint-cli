@@ -1,0 +1,20 @@
+apiVersion: mke.mirantis.com/v1alpha1
+kind: MkeIngress
+metadata:
+  labels:
+    app.kubernetes.io/name: mkeingress
+    app.kubernetes.io/instance: mkeingress-sample
+    app.kubernetes.io/part-of: mke-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: mke-operator
+  name: mkeingress-sample
+spec:
+  enabled: true
+  provider: ingress-nginx
+  config: |
+    controller:
+      service:
+        type: NodePort
+        nodePorts:
+          http: 30000
+          https: 30001

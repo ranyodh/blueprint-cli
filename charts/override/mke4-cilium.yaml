@@ -1,0 +1,6 @@
+debug:
+  enabled: false
+operator:
+  replicas: 1
+  prometheus:
+    enabled: false
