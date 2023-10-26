@@ -29,3 +29,9 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release to Public Repository
+        uses: softprops/action-gh-release@v1
+        with:
+          repository: Mirantis/boundless
+          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
