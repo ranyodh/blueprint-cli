@@ -33,5 +33,5 @@ jobs:
       - name: Release to Public Repository
         uses: softprops/action-gh-release@v1
         with:
-          repository: Mirantis/boundless
+          repository: ranyodh/boundless-tech-preview
           token: ${{ secrets.PUBLIC_REPO_TOKEN }}
