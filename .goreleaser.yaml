@@ -39,6 +39,11 @@ archives:
         format: zip
     files:
       - none*
+release:
+  github:
+    owner: ranyodh
+    name: boundless-tech-preview
+  name_template: "bocli-v{{.Version}}"
 
 changelog:
   sort: asc
