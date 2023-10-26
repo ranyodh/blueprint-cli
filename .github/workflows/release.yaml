@@ -5,11 +5,8 @@ on:
     tags:
       - "*" # triggers only if push new tag version, like `0.8.4` or else
 
-  # to enable manually running a workflow (for testing)
-  workflow_dispatch:
-
 jobs:
-  build:
+  build-binaries:
     name: GoReleaser build
     runs-on: ubuntu-latest
 
@@ -31,4 +28,4 @@ jobs:
           version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
