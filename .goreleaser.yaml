@@ -45,8 +45,6 @@ release:
   github:
     owner: Mirantis
     name: boundless
-    draft: true
-    prerelease: auto
 
 changelog:
   sort: asc
