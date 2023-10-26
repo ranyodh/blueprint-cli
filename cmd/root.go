@@ -15,6 +15,8 @@ import (
 	"boundless-cli/pkg/config"
 )
 
+const boundlessManifestUrl = "https://raw.githubusercontent.com/mirantis/boundless/main/deploy/static/boundless-operator.yaml"
+
 var DefaultComponents = config.Components{
 	Core: config.Core{
 		Ingress: &config.CoreComponent{
@@ -53,8 +55,8 @@ var DefaultComponents = config.Components{
 
 // App is the main urfave/cli.App for boctl
 var App = &cli.App{
-	Name:  "boctl",
-	Usage: "mke cluster management tool",
+	Name:  "bocli",
+	Usage: "boundless operator management tool",
 	Flags: []cli.Flag{
 		debugFlag,
 		traceFlag,
@@ -214,7 +216,7 @@ func applyWrapper(c *cli.Context) error {
 	//}
 
 	log.Infof("Installing MKE Operator")
-	err = kubectlApply("https://raw.githubusercontent.com/ranyodh/boundless-tech-preview/main/deploy/static/boundless-operator.yaml")
+	err = kubectlApply(boundlessManifestUrl)
 	if err != nil {
 		return fmt.Errorf("failed to install MKE Operator: %w", err)
 	}
