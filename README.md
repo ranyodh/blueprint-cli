@@ -1,28 +1,22 @@
-# MKE 4 (Proof of Concept)
-
-**Table of Contents**
-1. [Introduction](#introduction)
-2. [Setup](#setup)
-   1. [Prerequisites](#prerequisites)
-   2. [Create machines on AWS](#create-machines-on-aws)
-3. [Install MKE](#install-mke)
-   1. [Compile the `mke` binary](#compile-the-mke-binary)
-   2. [Generate the `blueprint.yaml` config file](#generate-the-mkeyaml-config-file)
-   3. [MKE Config File](#mke-config-file)
-   3. [Deploy MKE](#deploy-mke)
-   4. [Update MKE](#update-mke)
-5. [Connect to MKE](#connect-to-mke)
-6. [Core Components](#core-components)
-7. [Add-ons](#add-ons)
-8. [Destroy MKE 4 deployment](#destroy-mke-4-deployment)
-9. [Install MKE 4 on Kind cluster](#install-mke-4-on-kind-cluster)
-
+# Boundless Operator - Tech Preview
 
 ## Introduction
 
 TBD
 
-## Setup
+## Quick Start
+
+### Install on Kind
+
+1. Install Kind
+   ````
+2. Install Boundless CLI Binary: 
+   ```
+   
+   curl -s -L https://github.com/ranyodh/boundless-tech-preview/releases/download/latest/bocli_darwin_x86_64.tar.gz | tar xvz - -C /usr/local/bin
+   ``
+
+
 
 ### Prerequisites
 Ensure that following are installed on the system:

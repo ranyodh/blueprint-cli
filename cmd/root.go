@@ -214,7 +214,7 @@ func applyWrapper(c *cli.Context) error {
 	//}
 
 	log.Infof("Installing MKE Operator")
-	err = kubectlApply("manifests/mke-operator.yaml")
+	err = kubectlApply("https://raw.githubusercontent.com/ranyodh/boundless-tech-preview/main/deploy/static/boundless-operator.yaml")
 	if err != nil {
 		return fmt.Errorf("failed to install MKE Operator: %w", err)
 	}
