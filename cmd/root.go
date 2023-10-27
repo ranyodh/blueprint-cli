@@ -13,6 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"boundless-cli/pkg/config"
+	"boundless-cli/version"
 )
 
 const boundlessManifestUrl = "https://raw.githubusercontent.com/mirantis/boundless/main/deploy/static/boundless-operator.yaml"
@@ -65,9 +66,21 @@ var App = &cli.App{
 	Before: actions(initLogging),
 	Commands: []*cli.Command{
 		{
+			Name:  "version",
+			Usage: "Output bocli version",
+			Action: func(ctx *cli.Context) error {
+				fmt.Printf("version: %s\n", version.Version)
+				return nil
+			},
+		},
+		{
 			Name:  "init",
 			Usage: "create a cluster",
 			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "version",
+					Usage: "Include a skeleton k0s config section",
+				},
 				&cli.BoolFlag{
 					Name:  "k0s",
 					Usage: "Include a skeleton k0s config section",

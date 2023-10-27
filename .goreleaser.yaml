@@ -22,6 +22,10 @@ builds:
     flags:
       - -trimpath
       - -mod=vendor
+    ldflags:
+      - -s
+      - -w
+      - -X 'github.com/mirantis/boundless-cli/version.Version=v{{.Version}}'
 
 archives:
   - format: tar.gz
