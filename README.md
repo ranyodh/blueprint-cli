@@ -5,6 +5,8 @@
   * [Install on Kind](#install-on-kind)
   * [Install on Amazon VM](#install-on-amazon-vm)
 * [Boundless Operator Blueprints](#boundless-operator-blueprints)
+  * [Core Components](#core-components)
+  * [Add-ons](#add-ons)
 * [Sample Blueprints](#sample-blueprints)
 <!-- TOC -->
 
