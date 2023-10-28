@@ -1,8 +1,16 @@
 # Boundless Operator - Tech Preview
 
+<!-- TOC -->
+* [Quick Start](#quick-start)
+  * [Install on Kind](#install-on-kind)
+  * [Install on Amazon VM](#install-on-amazon-vm)
+* [Boundless Operator Blueprints](#boundless-operator-blueprints)
+* [Sample Blueprints](#sample-blueprints)
+<!-- TOC -->
+
 ## Quick Start
 
-### Install Boundless Operator on Kind
+### Install on Kind
 
 1. Install `Kind`: https://kind.sigs.k8s.io/docs/user/quick-start/
 2. Install Boundless CLI binary: 
