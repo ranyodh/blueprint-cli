@@ -1,36 +1,55 @@
 # Boundless Operator - Tech Preview
 
-## Introduction
-
-TBD
-
 ## Quick Start
 
-### Install on Kind
+### Install Boundless Operator on Kind
 
-1. Install Kind
-   ````
-2. Install Boundless CLI Binary: 
+1. Install `Kind`: https://kind.sigs.k8s.io/docs/user/quick-start/
+2. Install Boundless CLI binary: 
+   ```shell
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mirantis/boundless/main/script/install.sh)"
    ```
-   
-   curl -s -L https://github.com/ranyodh/boundless-tech-preview/releases/download/latest/bocli_darwin_x86_64.tar.gz | tar xvz - -C /usr/local/bin
-   ``
+   This will install `bocli` to `/usr/local/bin`. See [here](https://github.com/Mirantis/boundless/releases) for all releases.
+3. Generate a basic blueprint file:
+   ```shell
+   bocli init --kind > blueprint.yaml
+   ```
+   This will create a basic blueprints file `blueprint.yaml`. See a [sample here](#sample-blueprint-for-kind-cluster)
+4. Create the cluster:
+   ```shell
+   bocli apply --config blueprint.yaml
+   ```
+5. Connect to the cluster:
+   ```shell
+   export KUBECONFIG=./kubeconfig
+   kubectl get pods
+   ```
+   Note: `bocli` will create a `kubeconfig` file in the current directory. 
+   Use this file to connect to the cluster.
+6. Update the cluster by modifying `blueprint.yaml` and then running:
+   ```shell
+   bocli update --config blueprint.yaml
+   ```
+7. Delete the cluster:
+   ```shell
+   bocli reset --config blueprint.yaml
+   ```
 
-
+### Install on Amazon VM
 
 ### Prerequisites
 Ensure that following are installed on the system:
-* `k0sctl` (required for installing k0s distribution)
+* `k0sctl` (required for installing k0s distribution): https://github.com/k0sproject/k0sctl#installation
 * `terraform` (for creating VMs on AWS)
 
-### Create machines on AWS
+### Create virtual machines on AWS
 
 There are `terraform` scripts in the `example/` directory that can be used to create machines on AWS.
 
 1. `cd example/aws-tf`
 2. Create a `terraform.tfvars` file with the content similar to:
    ```
-   cluster_name = "rs-mke4-test"
+   cluster_name = "rs-boundless-test"
    controller_count = 1
    worker_count = 1
    cluster_flavor = "m5.large"
@@ -39,40 +58,147 @@ There are `terraform` scripts in the `example/` directory that can be used to cr
 4. `terraform apply`
 5. `terraform output --raw bop_cluster > ./blueprint.yaml`
 
-### Install Boundless Operator
+### Install Boundless Operator on `k0s`
 
-#### Compile the `boctl` binary
-`make build`
+1. Install Boundless CLI binary:
+   ```shell
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mirantis/boundless/main/script/install.sh)"
+   ```
+   This will install `bocli` to `/usr/local/bin`. See [here](https://github.com/Mirantis/boundless/releases) for all releases.
+2. Generate a basic blueprint file:
+   ```shell
+   bocli init > blueprint.yaml
+   ```
+   This will create a basic blueprints file `blueprint.yaml`. See a [sample here](#sample-blueprint-for-k0s-cluster)
+3. Now, edit the `blueprint.yaml` file to set the `spec.infra.hosts` from the output of `terraform output --raw bop_cluster`.
 
-#### Generate the `blueprint.yaml` config file
-`make init`
+   The host section should look similar to:
+   ```yaml
+   spec:
+     infra:
+       hosts:
+       - ssh:
+           address: 52.91.89.114
+           keyPath: ./example/aws-tf/aws_private.pem
+           port: 22
+           user: ubuntu
+         role: controller
+       - ssh:
+           address: 10.0.0.2
+           keyPath: ./example/aws-tf/aws_private.pem
+           port: 22
+           user: ubuntu
+         role: worker
+   ```
+4. Create the cluster:
+   ```shell
+   bocli apply --config blueprint.yaml
+   ```
+5. Connect to the cluster:
+   ```shell
+   export KUBECONFIG=./kubeconfig
+   kubectl get pods
+   ```
+   Note: `bocli` will create a `kubeconfig` file in the current directory. 
+   Use this file to connect to the cluster.
+6. Update the cluster by modifying `blueprint.yaml` and then running:
+   ```shell
+   bocli update --config blueprint.yaml
+   ```
+7. Delete the cluster:
+   ```shell
+   bocli reset --config blueprint.yaml
+   ```
+8. Delete virtual machines:
+   ```bash
+   cd example/aws-tf
+   terraform destroy --auto-approve
+   ```
 
-Now, edit the `blueprint.yaml` file to set the `spec.infra.hosts` from the output of `terraform output --raw bop_cluster`.
+## Boundless Operator Blueprints
 
-The host section should look similar to:
+### Core Components
+
+Currently, you can replace the ingress controller from `ingress-nginx` to `kong` by updating the `blueprint.yaml` file:
 ```yaml
 spec:
-  infra:
-    hosts:
-    - ssh:
-        address: 52.91.89.114
-        keyPath: ./example/aws-tf/aws_private.pem
-        port: 22
-        user: ubuntu
-      role: controller
-    - ssh:
-        address: 10.0.0.2
-        keyPath: ./example/aws-tf/aws_private.pem
-        port: 22
-        user: ubuntu
-      role: worker
+  mke:
+    components:
+      core:
+        ingress:
+          enabled: true
+          provider: kong # ingress-nginx, kong, etc.
 ```
 
-##### Boundless Operator Blueprint
+> If the cluster is already deployed, run `bocli reset` to destroy the cluster and then run `bocli apply` to recreate it.
 
-The complete `blueprint.yaml` file should look similar to the following. This config file will deploy MKE 4 with `k0s` as the Kubernetes distribution and `ingress-nginx` as the ingress controller and one add-on `nginx`:
+### Add-ons
+Update the `blueprint.yaml` file to add add-ons to the cluster. The add-ons are defined in the `spec
+.components.addons` section.
+
+Any public Helm chart can be used as an add-on.
+
+Use the following configuration to add the `grafana` as an add-on:
 ```yaml
-apiVersion: boctl.mirantis.com/v1beta1
+spec:
+ components:
+   addons:
+   - name: my-grafana
+     enabled: true
+     kind: MKEAddon
+     namespace: monitoring
+     chart:
+       name: grafana
+       repo: https://grafana.github.io/helm-charts
+       version: 6.58.7
+       values: |
+         ingress:
+           enabled: true
+```
+and then run `bocli update` to update the cluster.
+
+## Sample Blueprints
+
+### Sample Blueprint for `Kind` cluster:
+```yaml
+apiVersion: boctl.mirantis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: kind-cluster
+spec:
+  kubernetes:
+    provider: kind
+  components:
+    core:
+      ingress:
+        enabled: true
+        provider: ingress-nginx
+        config:
+          controller:
+            service:
+              nodePorts:
+                http: 30000
+                https: 30001
+              type: NodePort
+    addons:
+      - name: example-server
+        kind: HelmAddon
+        enabled: true
+        namespace: default
+        chart:
+          name: nginx
+          repo: https://charts.bitnami.com/bitnami
+          version: 15.1.1
+          values: |
+            "service":
+              "type": "ClusterIP"
+
+```
+
+### Sample Blueprint for `k0s` cluster:
+
+```yaml
+apiVersion: boctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
   name: bop-cluster
@@ -94,101 +220,33 @@ spec:
   kubernetes:
     provider: k0s
     version: 1.27.4+k0s.0
-  mke:
-    components:
-      core:
-        ingress:
-          enabled: true
-          provider: ingress-nginx
-          config:
-            controller:
-              service:
-                nodePorts:
-                  http: 30000
-                  https: 30001
-                type: NodePort
-      addons:
-      - name: example-server
-        kind: MKEAddon
-        enabled: true
-        namespace: default
-        chart:
-          name: nginx
-          repo: https://charts.bitnami.com/bitnami
-          version: 15.1.1
-          values: |2
-            "service":
-              "type": "ClusterIP"
+  components:
+   core:
+     ingress:
+       enabled: true
+       provider: ingress-nginx
+       config:
+         controller:
+           service:
+             nodePorts:
+               http: 30000
+               https: 30001
+             type: NodePort
+   addons:
+   - name: example-server
+     kind: HelmAddon
+     enabled: true
+     namespace: default
+     chart:
+       name: nginx
+       repo: https://charts.bitnami.com/bitnami
+       version: 15.1.1
+       values: |2
+         "service":
+           "type": "ClusterIP"
 ```
 
-#### Deploy Blueprint
-`make apply`
 
-#### Update Blueprint
-`make update`
-
-### Connect to cluster
-The `kubeconfig` file will be generated in the current directory. Use this file to connect to the cluster.
-```bash
-export KUBECONFIG=./kubeconfig
-kubectl get nodes
-kubectl get pods
-```
-
-### Core Components
-
-Currently, you can replace the ingress controller from `ingress-nginx` to `kong` by updating the `blueprint.yaml` file:
-```yaml
-spec:
-  mke:
-    components:
-      core:
-        ingress:
-          enabled: true
-          provider: kong # ingress-nginx, kong, etc.
-```
-
-> If the cluster is already deployed, run `make reset` to destroy the cluster and then run `make apply` to recreate it.
-
-### Add-ons
-Update the `blueprint.yaml` file to add add-ons to the cluster. The add-ons are defined in the `spec.mke.components.addons` section.
-
-Any public Helm chart can be used as an add-on.
-
-Use the following configuration to add the `grafana` as an add-on:
-```yaml
-spec:
-  mke:
-    components:
-      addons:
-      - name: my-grafana
-        enabled: true
-        kind: MKEAddon
-        namespace: monitoring
-        chart:
-          name: grafana
-          repo: https://grafana.github.io/helm-charts
-          version: 6.58.7
-          values: |
-            ingress:
-              enabled: true
-```
-and then run `make update` to update the cluster.
-
-### Cleanup
-
-#### Remove Boundless Operator from the cluster
-`make reset`
-
-#### Destroy the cluster
-```bash
-cd example/aws-tf
-terraform destroy --auto-approve
-```
-
-## Install Boundless Operator on Kind cluster
-
-[Install Boundless Operator on Kind](demo%2Fbop-with-kind.md)
 
 
 

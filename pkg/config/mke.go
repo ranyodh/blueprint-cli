@@ -5,17 +5,17 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-type MkeCluster struct {
-	APIVersion string         `yaml:"apiVersion"`
-	Kind       string         `yaml:"kind"`
-	Metadata   Metadata       `yaml:"metadata"`
-	Spec       MkeClusterSpec `yaml:"spec"`
+type Cluster struct {
+	APIVersion string      `yaml:"apiVersion"`
+	Kind       string      `yaml:"kind"`
+	Metadata   Metadata    `yaml:"metadata"`
+	Spec       ClusterSpec `yaml:"spec"`
 }
 
-type MkeClusterSpec struct {
-	Infra      Infra      `yaml:"infra"`
-	Kubernetes Kubernetes `yaml:"kubernetes"`
-	Mke        Mke        `yaml:"mke"`
+type ClusterSpec struct {
+	Infra      Infra      `yaml:"infra,omitempty"`
+	Kubernetes Kubernetes `yaml:"kubernetes,omitempty"`
+	Components Components `yaml:"components"`
 }
 
 type Infra struct {
@@ -24,12 +24,8 @@ type Infra struct {
 
 type Kubernetes struct {
 	Provider string      `yaml:"provider"`
-	Version  string      `yaml:"version"`
+	Version  string      `yaml:"version,omitempty"`
 	Config   dig.Mapping `yaml:"config,omitempty"`
-}
-
-type Mke struct {
-	Components Components `yaml:"components"`
 }
 
 type Components struct {

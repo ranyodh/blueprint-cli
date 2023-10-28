@@ -6,6 +6,9 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const apiVersion = "boctl.mirantis.com/v1alpha1"
+const apiVersionK0s = "k0sctl.k0sproject.io/v1beta1"
+
 func ParseK0sCluster(data []byte) (K0sCluster, error) {
 	var cluster K0sCluster
 	err := yaml.Unmarshal(data, &cluster)
@@ -15,11 +18,11 @@ func ParseK0sCluster(data []byte) (K0sCluster, error) {
 	return cluster, nil
 }
 
-func ParseMkeCluster(data []byte) (MkeCluster, error) {
-	var mkeCluster MkeCluster
+func ParseMkeCluster(data []byte) (Cluster, error) {
+	var mkeCluster Cluster
 	err := yaml.Unmarshal(data, &mkeCluster)
 	if err != nil {
-		return MkeCluster{}, err
+		return Cluster{}, err
 	}
 
 	return mkeCluster, nil
@@ -35,9 +38,9 @@ func ParseCoreComponentManifests(data []byte) (v1.HelmChart, error) {
 	return helmChart, nil
 }
 
-func ConvertToK0s(mke MkeCluster) K0sCluster {
+func ConvertToK0s(mke Cluster) K0sCluster {
 	return K0sCluster{
-		APIVersion: "k0sctl.k0sproject.io/v1beta1",
+		APIVersion: apiVersionK0s,
 		Kind:       "Cluster",
 		Metadata: Metadata{
 			Name: mke.Metadata.Name,
@@ -53,14 +56,14 @@ func ConvertToK0s(mke MkeCluster) K0sCluster {
 	}
 }
 
-func ConvertToMke(k0s K0sCluster, components Components) MkeCluster {
-	return MkeCluster{
-		APIVersion: k0s.APIVersion,
+func ConvertToClusterWithK0s(k0s K0sCluster, components Components) Cluster {
+	return Cluster{
+		APIVersion: apiVersion,
 		Kind:       "Cluster",
 		Metadata: Metadata{
 			Name: k0s.Metadata.Name,
 		},
-		Spec: MkeClusterSpec{
+		Spec: ClusterSpec{
 			Infra: Infra{
 				Hosts: k0s.Spec.Hosts,
 			},
@@ -69,9 +72,23 @@ func ConvertToMke(k0s K0sCluster, components Components) MkeCluster {
 				Version:  k0s.Spec.K0S.Version,
 				Config:   k0s.Spec.K0S.Config,
 			},
-			Mke: Mke{
-				Components: components,
+			Components: components,
+		},
+	}
+}
+
+func ConvertToClusterWithKind(name string, components Components) Cluster {
+	return Cluster{
+		APIVersion: apiVersion,
+		Kind:       "Cluster",
+		Metadata: Metadata{
+			Name: name,
+		},
+		Spec: ClusterSpec{
+			Kubernetes: Kubernetes{
+				Provider: "kind",
 			},
+			Components: components,
 		},
 	}
 }

@@ -69,7 +69,7 @@ data "aws_ami" "ubuntu" {
 
 locals {
   k0s_tmpl = {
-    apiVersion = "boctl.mirantis.com/v1beta1"
+    apiVersion = "boctl.mirantis.com/v1alpha1"
     kind       = "cluster"
     metadata = {
       name = var.cluster_name
@@ -99,17 +99,15 @@ locals {
           }
         }
       }
-      mke = {
-        components = {
-          core = {
-            cni = {
-              enabled  = true
-              provider = "calico"
-            }
-            ingress = {
-              enabled  = true
-              provider = "ingress-nginx"
-            }
+      components = {
+        core = {
+          cni = {
+            enabled  = true
+            provider = "calico"
+          }
+          ingress = {
+            enabled  = true
+            provider = "ingress-nginx"
           }
         }
       }

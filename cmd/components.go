@@ -18,6 +18,42 @@ import (
 	"boundless-cli/pkg/config"
 )
 
+var DefaultComponents = config.Components{
+	Core: config.Core{
+		Ingress: &config.CoreComponent{
+			Enabled:  true,
+			Provider: "ingress-nginx",
+			Config: dig.Mapping{
+				"controller": dig.Mapping{
+					"service": dig.Mapping{
+						"type": "NodePort",
+						"nodePorts": dig.Mapping{
+							"http":  30000,
+							"https": 30001,
+						},
+					},
+				},
+			},
+		},
+	},
+	Addons: []config.Addons{
+		{
+			Name:      "example-server",
+			Kind:      "HelmAddon",
+			Enabled:   true,
+			Namespace: "default",
+			Chart: config.Chart{
+				Name:    "nginx",
+				Repo:    "https://charts.bitnami.com/bitnami",
+				Version: "15.1.1",
+				Values: `"service":
+  "type": "ClusterIP"
+`,
+			},
+		},
+	},
+}
+
 func installComponents(components config.Components) error {
 	ingressConfig, err := yamlValues(components.Core.Ingress.Config)
 	if err != nil {

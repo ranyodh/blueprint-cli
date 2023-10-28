@@ -18,7 +18,7 @@ import (
 
 const KubeConfigFile = "kubeconfig"
 
-func initMKEConfig(ctx *cli.Context) (config.MkeCluster, error) {
+func initBlueprint(ctx *cli.Context) (config.Cluster, error) {
 	f := ctx.String("config")
 	if f == "" {
 		f = "blueprint.yaml"
@@ -26,24 +26,24 @@ func initMKEConfig(ctx *cli.Context) (config.MkeCluster, error) {
 
 	file, err := configReader(f)
 	if err != nil {
-		return config.MkeCluster{}, err
+		return config.Cluster{}, err
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		return config.MkeCluster{}, err
+		return config.Cluster{}, err
 	}
 
 	subst, err := envsubst.Bytes(content)
 	if err != nil {
-		return config.MkeCluster{}, err
+		return config.Cluster{}, err
 	}
 
 	log.Debugf("Loaded configuration:\n%s", subst)
 	cfg, err := config.ParseMkeCluster(subst)
 	if err != nil {
-		return config.MkeCluster{}, err
+		return config.Cluster{}, err
 	}
 
 	return cfg, nil
@@ -103,7 +103,7 @@ func createKubeConfig(kubeconfig string) error {
 }
 
 func getK0sctlConfigPath(c *cli.Context) (string, error) {
-	mkeConfig, err := initMKEConfig(c)
+	mkeConfig, err := initBlueprint(c)
 	if err != nil {
 		return "", err
 	}
