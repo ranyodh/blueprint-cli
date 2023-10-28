@@ -80,7 +80,7 @@ func initWrapper(c *cli.Context) error {
 	return encode(config.ConvertToClusterWithK0s(k0sConfig, DefaultComponents))
 }
 
-func encode(mkeConfig config.Cluster) error {
+func encode(blueprint config.Cluster) error {
 	encoder := yaml.NewEncoder(os.Stdout)
-	return encoder.Encode(&mkeConfig)
+	return encoder.Encode(&blueprint)
 }

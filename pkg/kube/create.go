@@ -29,24 +29,22 @@ func CreateOrUpdate(obj client.Object) error {
 		return fmt.Errorf("failed to create kubernetes client: %v", err)
 	}
 
-	//log.Debug("Creating Mke Cluster resource")
-
 	existing := &v1alpha1.Cluster{}
 	err = kubeClient.Get(context.Background(), client.ObjectKeyFromObject(obj), existing)
 	if err != nil {
 		if client.IgnoreNotFound(err) != nil {
-			return fmt.Errorf("failed to get mke cluster object: %v", err)
+			return fmt.Errorf("failed to get cluster object: %v", err)
 		}
 	}
 	if existing.Name != "" {
 		obj.SetResourceVersion(existing.GetResourceVersion())
 		err = kubeClient.Update(context.Background(), obj)
 		if err != nil {
-			return fmt.Errorf("failed to update mke cluster object: %v", err)
+			return fmt.Errorf("failed to update cluster object: %v", err)
 		}
 	} else {
 		if err := kubeClient.Create(context.Background(), obj); err != nil {
-			return fmt.Errorf("failed to create mke cluster object: %v", err)
+			return fmt.Errorf("failed to create cluster object: %v", err)
 		}
 	}
 

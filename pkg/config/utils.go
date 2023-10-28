@@ -18,14 +18,14 @@ func ParseK0sCluster(data []byte) (K0sCluster, error) {
 	return cluster, nil
 }
 
-func ParseMkeCluster(data []byte) (Cluster, error) {
-	var mkeCluster Cluster
-	err := yaml.Unmarshal(data, &mkeCluster)
+func ParseBoundlessCluster(data []byte) (Cluster, error) {
+	var cluster Cluster
+	err := yaml.Unmarshal(data, &cluster)
 	if err != nil {
 		return Cluster{}, err
 	}
 
-	return mkeCluster, nil
+	return cluster, nil
 }
 
 func ParseCoreComponentManifests(data []byte) (v1.HelmChart, error) {
@@ -38,19 +38,19 @@ func ParseCoreComponentManifests(data []byte) (v1.HelmChart, error) {
 	return helmChart, nil
 }
 
-func ConvertToK0s(mke Cluster) K0sCluster {
+func ConvertToK0s(cluster Cluster) K0sCluster {
 	return K0sCluster{
 		APIVersion: apiVersionK0s,
 		Kind:       "Cluster",
 		Metadata: Metadata{
-			Name: mke.Metadata.Name,
+			Name: cluster.Metadata.Name,
 		},
 		Spec: K0sClusterSpec{
-			Hosts: mke.Spec.Infra.Hosts,
+			Hosts: cluster.Spec.Infra.Hosts,
 			K0S: K0s{
-				Version:       mke.Spec.Kubernetes.Version,
-				DynamicConfig: digBool(mke.Spec.Kubernetes.Config, "dynamicConfig"),
-				Config:        mke.Spec.Kubernetes.Config,
+				Version:       cluster.Spec.Kubernetes.Version,
+				DynamicConfig: digBool(cluster.Spec.Kubernetes.Config, "dynamicConfig"),
+				Config:        cluster.Spec.Kubernetes.Config,
 			},
 		},
 	}

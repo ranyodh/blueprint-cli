@@ -61,7 +61,7 @@ func applyWrapper(c *cli.Context) error {
 
 	// install components
 	log.Info("Applying Boundless Operator resource")
-	err = installComponents(config.Spec.Components)
+	err = installComponents(config)
 	if err != nil {
 		return fmt.Errorf("failed to install components: %w", err)
 	}

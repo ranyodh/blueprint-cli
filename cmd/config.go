@@ -41,7 +41,7 @@ func initBlueprint(ctx *cli.Context) (config.Cluster, error) {
 	}
 
 	log.Debugf("Loaded configuration:\n%s", subst)
-	cfg, err := config.ParseMkeCluster(subst)
+	cfg, err := config.ParseBoundlessCluster(subst)
 	if err != nil {
 		return config.Cluster{}, err
 	}
@@ -103,12 +103,12 @@ func createKubeConfig(kubeconfig string) error {
 }
 
 func getK0sctlConfigPath(c *cli.Context) (string, error) {
-	mkeConfig, err := initBlueprint(c)
+	blueprint, err := initBlueprint(c)
 	if err != nil {
 		return "", err
 	}
 
-	k0sctlConfig := config.ConvertToK0s(mkeConfig)
+	k0sctlConfig := config.ConvertToK0s(blueprint)
 	if err != nil {
 		return "", err
 	}

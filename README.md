@@ -132,12 +132,11 @@ There are `terraform` scripts in the `example/` directory that can be used to cr
 Currently, you can replace the ingress controller from `ingress-nginx` to `kong` by updating the `blueprint.yaml` file:
 ```yaml
 spec:
-  mke:
-    components:
-      core:
-        ingress:
-          enabled: true
-          provider: kong # ingress-nginx, kong, etc.
+ components:
+   core:
+     ingress:
+       enabled: true
+       provider: kong # ingress-nginx, kong, etc.
 ```
 
 > If the cluster is already deployed, run `bocli reset` to destroy the cluster and then run `bocli apply` to recreate it.
@@ -155,7 +154,7 @@ spec:
    addons:
    - name: my-grafana
      enabled: true
-     kind: MKEAddon
+     kind: HelmAddon
      namespace: monitoring
      chart:
        name: grafana

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: mke-system
+  name: boundless-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -88,7 +88,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: helm-controller
-    namespace: mke-system
+    namespace: boundless-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -101,7 +101,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: helm-controller
-    namespace: mke-system
+    namespace: boundless-system
 
 ---
 apiVersion: apiextensions.k8s.io/v1
@@ -316,13 +316,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: helm-controller
-  namespace: mke-system
+  namespace: boundless-system
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: helm-controller
-  namespace: mke-system
+  namespace: boundless-system
   labels:
     app: helm-controller
 spec:

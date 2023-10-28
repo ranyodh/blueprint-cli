@@ -54,7 +54,8 @@ var DefaultComponents = config.Components{
 	},
 }
 
-func installComponents(components config.Components) error {
+func installComponents(cluster config.Cluster) error {
+	components := cluster.Spec.Components
 	ingressConfig, err := yamlValues(components.Core.Ingress.Config)
 	if err != nil {
 		return fmt.Errorf("failed to convert ingress config to yaml: %w", err)
@@ -79,7 +80,7 @@ func installComponents(components config.Components) error {
 
 	c := v1alpha1.Cluster{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "mkecluster",
+			Name:      cluster.Metadata.Name,
 			Namespace: v1.NamespaceDefault,
 		},
 		Spec: v1alpha1.ClusterSpec{
@@ -96,9 +97,9 @@ func installComponents(components config.Components) error {
 		},
 	}
 
-	log.Info("Creating/Updating MKE cluster")
+	log.Info("Creating/Updating cluster")
 	if err := kube.CreateOrUpdate(&c); err != nil {
-		return fmt.Errorf("failed to create/update mke cluster object: %v", err)
+		return fmt.Errorf("failed to create/update cluster object: %v", err)
 	}
 
 	return nil

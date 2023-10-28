@@ -1,7 +1,7 @@
 apiVersion: boctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
-  name: mke-cluster
+  name: bop-cluster
 spec:
   infra:
     hosts:
@@ -33,7 +33,7 @@ spec:
                 https: 30001
               type: NodePort
     addons:
-      - name: mke-grafana
+      - name: my-grafana
         enabled: true
         kind: HelmAddon
         namespace: monitoring
@@ -55,7 +55,7 @@ spec:
           values: |
             service:
               type: ClusterIP
-      - name: mke-cert-manager
+      - name: my-cert-manager
         kind: HelmAddon
         enabled: true
         namespace: default

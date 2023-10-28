@@ -1,7 +1,7 @@
 apiVersion: boctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
-  name: mke-cluster
+  name: bop-cluster
 spec:
   infra:
     hosts:
@@ -33,9 +33,9 @@ spec:
                 https: 30001
               type: NodePort
     addons:
-      - name: mke-grafana
+      - name: my-grafana
         enabled: true
-        kind: MKEAddon
+        kind: HelmAddon
         namespace: monitoring
         chart:
           name: grafana
@@ -45,7 +45,7 @@ spec:
             ingress:
               enabled: true
       - name: example-server
-        kind: MKEAddon
+        kind: HelmAddon
         enabled: true
         namespace: default
         chart:

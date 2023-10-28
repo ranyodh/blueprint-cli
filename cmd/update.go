@@ -23,7 +23,7 @@ var cmdUpdate = &cli.Command{
 		}
 
 		log.Info("Updating Components")
-		err = installComponents(cfg.Spec.Components)
+		err = installComponents(cfg)
 		if err != nil {
 			return fmt.Errorf("failed to update components: %w", err)
 		}
