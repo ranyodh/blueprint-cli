@@ -1,10 +1,10 @@
-apiVersion: mke.mirantis.com/v1alpha1
-kind: MkeAddon
+apiVersion: boundless.mirantis.com/v1alpha1
+kind: Addon
 metadata:
-  name: mkeaddon-example-server
-spec:
   name: example-server
-  kind: MKEAddon
+spec:
+  name: my-example-server
+  kind: HelmAddon
   enabled: true
   namespace: default
   chart:
@@ -15,14 +15,14 @@ spec:
       "service":
         "type": "ClusterIP"
 ---
-apiVersion: mke.mirantis.com/v1alpha1
-kind: MkeAddon
+apiVersion: boundless.mirantis.com/v1alpha1
+kind: Addon
 metadata:
-  name: mkeaddon-grafana
+  name: grafana
 spec:
   name: my-grafana
   enabled: true
-  kind: MKEAddon
+  kind: HelmAddon
   namespace: monitoring
   chart:
     name: grafana

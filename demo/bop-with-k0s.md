@@ -11,7 +11,7 @@ Ensure that AWS machine already exists. Follow [Create machines on AWS](..%2FREA
 Create a file named `blueprint.yaml` with the following content. Ensure that `infra` section has the correct IP addresses of the machines.
 
 ```yaml
-apiVersion: boctl.mirantis.com/v1beta1
+apiVersion: boctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
   name: bop-cluster
