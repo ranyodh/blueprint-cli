@@ -5,7 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-type Cluster struct {
+type Blueprint struct {
 	APIVersion string      `yaml:"apiVersion"`
 	Kind       string      `yaml:"kind"`
 	Metadata   Metadata    `yaml:"metadata"`

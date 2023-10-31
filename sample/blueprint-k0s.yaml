@@ -1,5 +1,5 @@
-apiVersion: bctl.mirantis.com/v1alpha1
-kind: Cluster
+apiVersion: boundless.mirantis.com/v1alpha1
+kind: Blueprint
 metadata:
   name: kind-cluster
 spec:

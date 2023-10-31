@@ -170,8 +170,8 @@ and then run `bctl update` to update the cluster.
 
 ### Sample Blueprint for `Kind` cluster:
 ```yaml
-apiVersion: bctl.mirantis.com/v1alpha1
-kind: Cluster
+apiVersion: boundless.mirantis.com/v1alpha1
+kind: Blueprint
 metadata:
   name: kind-cluster
 spec:
@@ -207,8 +207,8 @@ spec:
 ### Sample Blueprint for `k0s` cluster:
 
 ```yaml
-apiVersion: bctl.mirantis.com/v1alpha1
-kind: Cluster
+apiVersion: boundless.mirantis.com/v1alpha1
+kind: Blueprint
 metadata:
   name: bop-cluster
 spec:
