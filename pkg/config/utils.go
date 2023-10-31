@@ -46,7 +46,7 @@ func ConvertToK0s(cluster Blueprint) K0sCluster {
 			Name: cluster.Metadata.Name,
 		},
 		Spec: K0sClusterSpec{
-			Hosts: cluster.Spec.Infra.Hosts,
+			Hosts: cluster.Spec.Kubernetes.Infra.Hosts,
 			K0S: K0s{
 				Version:       cluster.Spec.Kubernetes.Version,
 				DynamicConfig: digBool(cluster.Spec.Kubernetes.Config, "dynamicConfig"),
@@ -63,14 +63,14 @@ func ConvertToClusterWithK0s(k0s K0sCluster, components Components) Blueprint {
 		Metadata: Metadata{
 			Name: k0s.Metadata.Name,
 		},
-		Spec: ClusterSpec{
-			Infra: Infra{
-				Hosts: k0s.Spec.Hosts,
-			},
+		Spec: BlueprintSpec{
 			Kubernetes: Kubernetes{
 				Provider: "k0s",
 				Version:  k0s.Spec.K0S.Version,
 				Config:   k0s.Spec.K0S.Config,
+				Infra: Infra{
+					Hosts: k0s.Spec.Hosts,
+				},
 			},
 			Components: components,
 		},
@@ -84,7 +84,7 @@ func ConvertToClusterWithKind(name string, components Components) Blueprint {
 		Metadata: Metadata{
 			Name: name,
 		},
-		Spec: ClusterSpec{
+		Spec: BlueprintSpec{
 			Kubernetes: Kubernetes{
 				Provider: "kind",
 			},

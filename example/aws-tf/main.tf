@@ -69,25 +69,12 @@ data "aws_ami" "ubuntu" {
 
 locals {
   k0s_tmpl = {
-    apiVersion = "bctl.mirantis.com/v1alpha1"
-    kind       = "cluster"
+    apiVersion = "boundless.mirantis.com/v1alpha1"
+    kind       = "Blueprint"
     metadata = {
       name = var.cluster_name
     }
     spec = {
-      infra = {
-        hosts = [
-          for host in concat(aws_instance.cluster-controller, aws_instance.cluster-workers) : {
-            ssh = {
-              address = host.public_ip
-              user    = "ubuntu"
-              keyPath = local_file.aws_private_pem.filename
-              port    = 22
-            }
-            role = host.tags["Name"]
-          }
-        ]
-      }
       kubernetes = {
         provider = "k0s"
         version = "1.27.4+k0s.0"
@@ -97,6 +84,19 @@ locals {
               provider : "custom"
             }
           }
+        }
+        infra = {
+          hosts = [
+            for host in concat(aws_instance.cluster-controller, aws_instance.cluster-workers) : {
+              ssh = {
+                address = host.public_ip
+                user    = "ubuntu"
+                keyPath = local_file.aws_private_pem.filename
+                port    = 22
+              }
+              role = host.tags["Name"]
+            }
+          ]
         }
       }
       components = {

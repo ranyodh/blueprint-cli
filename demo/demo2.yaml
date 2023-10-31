@@ -3,23 +3,23 @@ kind: Blueprint
 metadata:
   name: bop-cluster
 spec:
-  infra:
-    hosts:
-      - ssh:
-          address: 3.80.73.246
-          keyPath: ./example/aws-tf/aws_private.pem
-          port: 22
-          user: ubuntu
-        role: controller
-      - ssh:
-          address: 3.226.255.130
-          keyPath: ./example/aws-tf/aws_private.pem
-          port: 22
-          user: ubuntu
-        role: worker
   kubernetes:
     provider: k0s
     version: 1.27.4+k0s.0
+    infra:
+      hosts:
+        - ssh:
+            address: 3.80.73.246
+            keyPath: ./example/aws-tf/aws_private.pem
+            port: 22
+            user: ubuntu
+          role: controller
+        - ssh:
+            address: 3.226.255.130
+            keyPath: ./example/aws-tf/aws_private.pem
+            port: 22
+            user: ubuntu
+          role: worker
   components:
     core:
       ingress:
