@@ -1,4 +1,4 @@
-apiVersion: boctl.mirantis.com/v1alpha1
+apiVersion: bctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
   name: k0s-cluster

@@ -69,7 +69,7 @@ data "aws_ami" "ubuntu" {
 
 locals {
   k0s_tmpl = {
-    apiVersion = "boctl.mirantis.com/v1alpha1"
+    apiVersion = "bctl.mirantis.com/v1alpha1"
     kind       = "cluster"
     metadata = {
       name = var.cluster_name
