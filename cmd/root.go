@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 
-	_ "github.com/k0sproject/k0sctl/pkg/apis/k0sctl.k0sproject.io/v1beta1/cluster"
 	"github.com/urfave/cli/v2"
 
 	"boundless-cli/version"
