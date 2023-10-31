@@ -13,9 +13,9 @@ import (
 
 const BoundlessManifestUrl = "https://raw.githubusercontent.com/mirantis/boundless/main/deploy/static/boundless-operator.yaml"
 
-// App is the main urfave/cli.App for boctl
+// App is the main urfave/cli.App for bctl
 var App = &cli.App{
-	Name:  "bocli",
+	Name:  "bctl",
 	Usage: "boundless operator management tool",
 	Flags: []cli.Flag{
 		debugFlag,
@@ -26,7 +26,7 @@ var App = &cli.App{
 	Commands: []*cli.Command{
 		{
 			Name:  "version",
-			Usage: "Output bocli version",
+			Usage: "Output bctl version",
 			Action: func(ctx *cli.Context) error {
 				fmt.Printf("version: %s\n", version.Version)
 				return nil

@@ -19,30 +19,30 @@
    ```shell
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mirantis/boundless/main/script/install.sh)"
    ```
-   This will install `bocli` to `/usr/local/bin`. See [here](https://github.com/Mirantis/boundless/releases) for all releases.
+   This will install `bctl` to `/usr/local/bin`. See [here](https://github.com/Mirantis/boundless/releases) for all releases.
 3. Generate a basic blueprint file:
    ```shell
-   bocli init --kind > blueprint.yaml
+   bctl init --kind > blueprint.yaml
    ```
    This will create a basic blueprints file `blueprint.yaml`. See a [sample here](#sample-blueprint-for-kind-cluster)
 4. Create the cluster:
    ```shell
-   bocli apply --config blueprint.yaml
+   bctl apply --config blueprint.yaml
    ```
 5. Connect to the cluster:
    ```shell
    export KUBECONFIG=./kubeconfig
    kubectl get pods
    ```
-   Note: `bocli` will create a `kubeconfig` file in the current directory. 
+   Note: `bctl` will create a `kubeconfig` file in the current directory. 
    Use this file to connect to the cluster.
 6. Update the cluster by modifying `blueprint.yaml` and then running:
    ```shell
-   bocli update --config blueprint.yaml
+   bctl update --config blueprint.yaml
    ```
 7. Delete the cluster:
    ```shell
-   bocli reset --config blueprint.yaml
+   bctl reset --config blueprint.yaml
    ```
 
 ### Install on Amazon VM
@@ -74,10 +74,10 @@ There are `terraform` scripts in the `example/` directory that can be used to cr
    ```shell
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mirantis/boundless/main/script/install.sh)"
    ```
-   This will install `bocli` to `/usr/local/bin`. See [here](https://github.com/Mirantis/boundless/releases) for all releases.
+   This will install `bctl` to `/usr/local/bin`. See [here](https://github.com/Mirantis/boundless/releases) for all releases.
 2. Generate a basic blueprint file:
    ```shell
-   bocli init > blueprint.yaml
+   bctl init > blueprint.yaml
    ```
    This will create a basic blueprints file `blueprint.yaml`. See a [sample here](#sample-blueprint-for-k0s-cluster)
 3. Now, edit the `blueprint.yaml` file to set the `spec.infra.hosts` from the output of `terraform output --raw bop_cluster`.
@@ -102,22 +102,22 @@ There are `terraform` scripts in the `example/` directory that can be used to cr
    ```
 4. Create the cluster:
    ```shell
-   bocli apply --config blueprint.yaml
+   bctl apply --config blueprint.yaml
    ```
 5. Connect to the cluster:
    ```shell
    export KUBECONFIG=./kubeconfig
    kubectl get pods
    ```
-   Note: `bocli` will create a `kubeconfig` file in the current directory. 
+   Note: `bctl` will create a `kubeconfig` file in the current directory. 
    Use this file to connect to the cluster.
 6. Update the cluster by modifying `blueprint.yaml` and then running:
    ```shell
-   bocli update --config blueprint.yaml
+   bctl update --config blueprint.yaml
    ```
 7. Delete the cluster:
    ```shell
-   bocli reset --config blueprint.yaml
+   bctl reset --config blueprint.yaml
    ```
 8. Delete virtual machines:
    ```bash
@@ -139,7 +139,7 @@ spec:
        provider: kong # ingress-nginx, kong, etc.
 ```
 
-> If the cluster is already deployed, run `bocli reset` to destroy the cluster and then run `bocli apply` to recreate it.
+> If the cluster is already deployed, run `bctl reset` to destroy the cluster and then run `bctl apply` to recreate it.
 
 ### Add-ons
 Update the `blueprint.yaml` file to add add-ons to the cluster. The add-ons are defined in the `spec
@@ -164,13 +164,13 @@ spec:
          ingress:
            enabled: true
 ```
-and then run `bocli update` to update the cluster.
+and then run `bctl update` to update the cluster.
 
 ## Sample Blueprints
 
 ### Sample Blueprint for `Kind` cluster:
 ```yaml
-apiVersion: boctl.mirantis.com/v1alpha1
+apiVersion: bctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
   name: kind-cluster
@@ -207,7 +207,7 @@ spec:
 ### Sample Blueprint for `k0s` cluster:
 
 ```yaml
-apiVersion: boctl.mirantis.com/v1alpha1
+apiVersion: bctl.mirantis.com/v1alpha1
 kind: Cluster
 metadata:
   name: bop-cluster
