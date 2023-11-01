@@ -54,7 +54,7 @@ var DefaultComponents = config.Components{
 	},
 }
 
-func installComponents(cluster config.Cluster) error {
+func installComponents(cluster config.Blueprint) error {
 	components := cluster.Spec.Components
 	ingressConfig, err := yamlValues(components.Core.Ingress.Config)
 	if err != nil {
@@ -78,12 +78,12 @@ func installComponents(cluster config.Cluster) error {
 		})
 	}
 
-	c := v1alpha1.Cluster{
+	c := v1alpha1.Blueprint{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cluster.Metadata.Name,
 			Namespace: v1.NamespaceDefault,
 		},
-		Spec: v1alpha1.ClusterSpec{
+		Spec: v1alpha1.BlueprintSpec{
 			Components: v1alpha1.Component{
 				Core: v1alpha1.Core{
 					Ingress: v1alpha1.IngressSpec{
@@ -97,9 +97,9 @@ func installComponents(cluster config.Cluster) error {
 		},
 	}
 
-	log.Info("Creating/Updating cluster")
+	log.Info("Applying Blueprint")
 	if err := kube.CreateOrUpdate(&c); err != nil {
-		return fmt.Errorf("failed to create/update cluster object: %v", err)
+		return fmt.Errorf("failed to create/update Blueprint object: %v", err)
 	}
 
 	return nil

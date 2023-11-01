@@ -18,11 +18,11 @@ func ParseK0sCluster(data []byte) (K0sCluster, error) {
 	return cluster, nil
 }
 
-func ParseBoundlessCluster(data []byte) (Cluster, error) {
-	var cluster Cluster
+func ParseBoundlessCluster(data []byte) (Blueprint, error) {
+	var cluster Blueprint
 	err := yaml.Unmarshal(data, &cluster)
 	if err != nil {
-		return Cluster{}, err
+		return Blueprint{}, err
 	}
 
 	return cluster, nil
@@ -38,7 +38,7 @@ func ParseCoreComponentManifests(data []byte) (v1.HelmChart, error) {
 	return helmChart, nil
 }
 
-func ConvertToK0s(cluster Cluster) K0sCluster {
+func ConvertToK0s(cluster Blueprint) K0sCluster {
 	return K0sCluster{
 		APIVersion: apiVersionK0s,
 		Kind:       "Cluster",
@@ -46,7 +46,7 @@ func ConvertToK0s(cluster Cluster) K0sCluster {
 			Name: cluster.Metadata.Name,
 		},
 		Spec: K0sClusterSpec{
-			Hosts: cluster.Spec.Infra.Hosts,
+			Hosts: cluster.Spec.Kubernetes.Infra.Hosts,
 			K0S: K0s{
 				Version:       cluster.Spec.Kubernetes.Version,
 				DynamicConfig: digBool(cluster.Spec.Kubernetes.Config, "dynamicConfig"),
@@ -56,35 +56,35 @@ func ConvertToK0s(cluster Cluster) K0sCluster {
 	}
 }
 
-func ConvertToClusterWithK0s(k0s K0sCluster, components Components) Cluster {
-	return Cluster{
+func ConvertToClusterWithK0s(k0s K0sCluster, components Components) Blueprint {
+	return Blueprint{
 		APIVersion: apiVersion,
-		Kind:       "Cluster",
+		Kind:       "Blueprint",
 		Metadata: Metadata{
 			Name: k0s.Metadata.Name,
 		},
-		Spec: ClusterSpec{
-			Infra: Infra{
-				Hosts: k0s.Spec.Hosts,
-			},
+		Spec: BlueprintSpec{
 			Kubernetes: Kubernetes{
 				Provider: "k0s",
 				Version:  k0s.Spec.K0S.Version,
 				Config:   k0s.Spec.K0S.Config,
+				Infra: Infra{
+					Hosts: k0s.Spec.Hosts,
+				},
 			},
 			Components: components,
 		},
 	}
 }
 
-func ConvertToClusterWithKind(name string, components Components) Cluster {
-	return Cluster{
+func ConvertToClusterWithKind(name string, components Components) Blueprint {
+	return Blueprint{
 		APIVersion: apiVersion,
-		Kind:       "Cluster",
+		Kind:       "Blueprint",
 		Metadata: Metadata{
 			Name: name,
 		},
-		Spec: ClusterSpec{
+		Spec: BlueprintSpec{
 			Kubernetes: Kubernetes{
 				Provider: "kind",
 			},

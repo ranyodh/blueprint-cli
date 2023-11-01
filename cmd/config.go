@@ -18,7 +18,7 @@ import (
 
 const KubeConfigFile = "kubeconfig"
 
-func initBlueprint(ctx *cli.Context) (config.Cluster, error) {
+func initBlueprint(ctx *cli.Context) (config.Blueprint, error) {
 	f := ctx.String("config")
 	if f == "" {
 		f = "blueprint.yaml"
@@ -26,24 +26,24 @@ func initBlueprint(ctx *cli.Context) (config.Cluster, error) {
 
 	file, err := configReader(f)
 	if err != nil {
-		return config.Cluster{}, err
+		return config.Blueprint{}, err
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		return config.Cluster{}, err
+		return config.Blueprint{}, err
 	}
 
 	subst, err := envsubst.Bytes(content)
 	if err != nil {
-		return config.Cluster{}, err
+		return config.Blueprint{}, err
 	}
 
 	log.Debugf("Loaded configuration:\n%s", subst)
 	cfg, err := config.ParseBoundlessCluster(subst)
 	if err != nil {
-		return config.Cluster{}, err
+		return config.Blueprint{}, err
 	}
 
 	return cfg, nil

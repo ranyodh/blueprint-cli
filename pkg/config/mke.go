@@ -5,15 +5,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-type Cluster struct {
-	APIVersion string      `yaml:"apiVersion"`
-	Kind       string      `yaml:"kind"`
-	Metadata   Metadata    `yaml:"metadata"`
-	Spec       ClusterSpec `yaml:"spec"`
+type Blueprint struct {
+	APIVersion string        `yaml:"apiVersion"`
+	Kind       string        `yaml:"kind"`
+	Metadata   Metadata      `yaml:"metadata"`
+	Spec       BlueprintSpec `yaml:"spec"`
 }
 
-type ClusterSpec struct {
-	Infra      Infra      `yaml:"infra,omitempty"`
+type BlueprintSpec struct {
 	Kubernetes Kubernetes `yaml:"kubernetes,omitempty"`
 	Components Components `yaml:"components"`
 }
@@ -26,6 +25,7 @@ type Kubernetes struct {
 	Provider string      `yaml:"provider"`
 	Version  string      `yaml:"version,omitempty"`
 	Config   dig.Mapping `yaml:"config,omitempty"`
+	Infra    Infra       `yaml:"infra,omitempty"`
 }
 
 type Components struct {

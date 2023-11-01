@@ -29,7 +29,7 @@ func CreateOrUpdate(obj client.Object) error {
 		return fmt.Errorf("failed to create kubernetes client: %v", err)
 	}
 
-	existing := &v1alpha1.Cluster{}
+	existing := &v1alpha1.Blueprint{}
 	err = kubeClient.Get(context.Background(), client.ObjectKeyFromObject(obj), existing)
 	if err != nil {
 		if client.IgnoreNotFound(err) != nil {

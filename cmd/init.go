@@ -13,7 +13,7 @@ import (
 
 var cmdInit = &cli.Command{
 	Name:  "init",
-	Usage: "create a cluster",
+	Usage: "create a blueprint",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "version",
@@ -80,7 +80,7 @@ func initWrapper(c *cli.Context) error {
 	return encode(config.ConvertToClusterWithK0s(k0sConfig, DefaultComponents))
 }
 
-func encode(blueprint config.Cluster) error {
+func encode(blueprint config.Blueprint) error {
 	encoder := yaml.NewEncoder(os.Stdout)
 	return encoder.Encode(&blueprint)
 }
