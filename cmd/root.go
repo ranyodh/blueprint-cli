@@ -43,6 +43,11 @@ var App = &cli.App{
 }
 
 func cmdWrapper(c *cli.Context) error {
+	// Print help if no arguments are given
+	if len(c.Args().Slice()) == 0 {
+		return cli.ShowAppHelp(c)
+	}
+
 	k0sctlConfigFile, err := getK0sctlConfigPath(c)
 	if err != nil {
 		return err
