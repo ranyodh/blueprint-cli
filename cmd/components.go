@@ -19,7 +19,7 @@ import (
 )
 
 var DefaultComponents = config.Components{
-	Core: config.Core{
+	Core: &config.Core{
 		Ingress: &config.CoreComponent{
 			Enabled:  true,
 			Provider: "ingress-nginx",
@@ -56,11 +56,23 @@ var DefaultComponents = config.Components{
 
 func installComponents(cluster config.Blueprint) error {
 	components := cluster.Spec.Components
-	ingressConfig, err := yamlValues(components.Core.Ingress.Config)
-	if err != nil {
-		return fmt.Errorf("failed to convert ingress config to yaml: %w", err)
+
+	// install/update core components
+	var core = v1alpha1.Core{}
+	if components.Core != nil && components.Core.Ingress != nil {
+		ingressConfig, err := yamlValues(components.Core.Ingress.Config)
+		if err != nil {
+			return fmt.Errorf("failed to convert ingress config to yaml: %w", err)
+		}
+
+		core.Ingress = v1alpha1.IngressSpec{
+			Enabled:  components.Core.Ingress.Enabled,
+			Provider: components.Core.Ingress.Provider,
+			Config:   ingressConfig,
+		}
 	}
 
+	// install/update addons
 	var addons []v1alpha1.AddonSpec
 	for _, addon := range components.Addons {
 		addons = append(addons, v1alpha1.AddonSpec{
@@ -85,13 +97,7 @@ func installComponents(cluster config.Blueprint) error {
 		},
 		Spec: v1alpha1.BlueprintSpec{
 			Components: v1alpha1.Component{
-				Core: v1alpha1.Core{
-					Ingress: v1alpha1.IngressSpec{
-						Enabled:  components.Core.Ingress.Enabled,
-						Provider: components.Core.Ingress.Provider,
-						Config:   ingressConfig,
-					},
-				},
+				Core:   core,
 				Addons: addons,
 			},
 		},

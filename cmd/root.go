@@ -11,6 +11,7 @@ import (
 )
 
 const BoundlessManifestUrl = "https://raw.githubusercontent.com/mirantis/boundless/main/deploy/static/boundless-operator.yaml"
+const NamespaceBoundlessSystem = "boundless-system"
 
 // App is the main urfave/cli.App for bctl
 var App = &cli.App{

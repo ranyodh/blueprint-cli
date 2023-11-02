@@ -7,7 +7,7 @@ import (
 )
 
 func installKindCluster(name string, kubeconfig string) error {
-	log.Debug("creating kind cluster %q with kubeconfig at: %s", name, kubeconfig)
+	log.Debugf("creating kind cluster %q with kubeconfig at: %s", name, kubeconfig)
 	if err := cmdRun("kind", "create", "cluster", "-n", name, "--kubeconfig", kubeconfig); err != nil {
 		return fmt.Errorf("failed to create kind cluster %w", err)
 	}

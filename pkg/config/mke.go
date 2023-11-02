@@ -13,8 +13,8 @@ type Blueprint struct {
 }
 
 type BlueprintSpec struct {
-	Kubernetes Kubernetes `yaml:"kubernetes,omitempty"`
-	Components Components `yaml:"components"`
+	Kubernetes *Kubernetes `yaml:"kubernetes,omitempty"`
+	Components Components  `yaml:"components"`
 }
 
 type Infra struct {
@@ -25,11 +25,11 @@ type Kubernetes struct {
 	Provider string      `yaml:"provider"`
 	Version  string      `yaml:"version,omitempty"`
 	Config   dig.Mapping `yaml:"config,omitempty"`
-	Infra    Infra       `yaml:"infra,omitempty"`
+	Infra    *Infra      `yaml:"infra,omitempty"`
 }
 
 type Components struct {
-	Core   Core     `yaml:"core,omitempty"`
+	Core   *Core    `yaml:"core,omitempty"`
 	Addons []Addons `yaml:"addons,omitempty"`
 }
 
