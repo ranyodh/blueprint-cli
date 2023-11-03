@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -38,7 +39,7 @@ func waitForPods(ctx context.Context, clientset kubernetes.Interface) error {
 	defer cancelFunc()
 
 	return wait.PollUntilContextCancel(timeoutCtx, 5*time.Second, true, func(ctx context.Context) (bool, error) {
-		pods, err := clientset.CoreV1().Pods(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
+		pods, err := clientset.CoreV1().Pods(NamespaceBoundlessSystem).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return false, fmt.Errorf("failed to list pods: %v", err)
 		}
@@ -49,11 +50,13 @@ func waitForPods(ctx context.Context, clientset kubernetes.Interface) error {
 
 		allRunning := true
 		for _, pod := range pods.Items {
+			log.Debugf("pod %s is %s", pod.Name, pod.Status.Phase)
 			if pod.Status.Phase != v1.PodRunning {
 				allRunning = false
 				break
 			}
 		}
+
 		return allRunning, nil
 	})
 }

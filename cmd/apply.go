@@ -27,19 +27,22 @@ func applyWrapper(c *cli.Context) error {
 		return err
 	}
 
-	switch config.Spec.Kubernetes.Provider {
-	case "k0s":
-		k0sctlConfigPath, err := getK0sctlConfigPath(c)
-		log.Infof("Installing Kubernetes distribution: %s", "k0s")
-		if err = installK0s(k0sctlConfigPath); err != nil {
-			return err
+	if config.Spec.Kubernetes != nil {
+		log.Infof("Installing Kubernetes distribution: %s", config.Spec.Kubernetes.Provider)
+		switch config.Spec.Kubernetes.Provider {
+		case "k0s":
+			k0sctlConfigPath, err := getK0sctlConfigPath(c)
+			if err = installK0s(k0sctlConfigPath); err != nil {
+				return err
+			}
+		case "kind":
+			log.Infof("Installing Kubernetes distribution: %s", "kind")
+			if err = installKindCluster(config.Metadata.Name, KubeConfigFile); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("invalid Kubernetes distribution provider: %s", config.Spec.Kubernetes.Provider)
 		}
-	case "kind":
-		log.Infof("Installing Kubernetes distribution: %s", "kind")
-		if err = installKindCluster(config.Metadata.Name, KubeConfigFile); err != nil {
-			return err
-		}
-
 	}
 
 	log.Infof("Waiting for nodes to be ready")
