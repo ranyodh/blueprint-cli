@@ -28,10 +28,10 @@ func applyWrapper(c *cli.Context) error {
 	}
 
 	if config.Spec.Kubernetes != nil {
+		log.Infof("Installing Kubernetes distribution: %s", config.Spec.Kubernetes.Provider)
 		switch config.Spec.Kubernetes.Provider {
 		case "k0s":
 			k0sctlConfigPath, err := getK0sctlConfigPath(c)
-			log.Infof("Installing Kubernetes distribution: %s", "k0s")
 			if err = installK0s(k0sctlConfigPath); err != nil {
 				return err
 			}
@@ -40,6 +40,8 @@ func applyWrapper(c *cli.Context) error {
 			if err = installKindCluster(config.Metadata.Name, KubeConfigFile); err != nil {
 				return err
 			}
+		default:
+			return fmt.Errorf("invalid Kubernetes distribution provider: %s", config.Spec.Kubernetes.Provider)
 		}
 	}
 

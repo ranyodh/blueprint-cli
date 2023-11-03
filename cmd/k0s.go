@@ -16,7 +16,7 @@ func installK0s(config string) error {
 	if err := createKubeConfig(config); err != nil {
 		return fmt.Errorf("failed to create kubeconfig: %w", err)
 	}
-	log.Debug("kubeconfig file for k0s cluster: %s", KubeConfigFile)
+	log.Debugf("kubeconfig file for k0s cluster: %s", KubeConfigFile)
 
 	return nil
 }

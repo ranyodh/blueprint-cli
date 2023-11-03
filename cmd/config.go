@@ -117,7 +117,7 @@ func getK0sctlConfigPath(c *cli.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
+	
 	k0sctlConfigFile, err := writeToTempFile(data)
 	if err != nil {
 		return "", err
