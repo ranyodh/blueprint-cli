@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mattn/go-colorable"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 
-	"github.com/mattn/go-colorable"
-
+	"boundless-cli/internal/boundless"
 	"boundless-cli/internal/distro"
 	"boundless-cli/internal/k8s"
 	"boundless-cli/internal/types"
@@ -26,8 +26,7 @@ const (
 var (
 	pFlags        *PersistenceFlags
 	blueprintFlag string
-	customBOPFlag string
-	kubeFlags     = genericclioptions.NewConfigFlags(k8s.UsePersistentConfig)
+	operatorUri   string
 
 	blueprint  types.Blueprint
 	kubeConfig *k8s.KubeConfig
@@ -43,7 +42,8 @@ var (
 		SilenceUsage: true,
 	}
 
-	out = colorable.NewColorableStdout()
+	kubeFlags = genericclioptions.NewConfigFlags(k8s.UsePersistentConfig)
+	out       = colorable.NewColorableStdout()
 )
 
 func init() {
@@ -53,6 +53,7 @@ func init() {
 		applyCmd(),
 		updateCmd(),
 		resetCmd(),
+		upgradeCmd(),
 	)
 
 	pFlags = NewPersistenceFlags()
@@ -132,16 +133,16 @@ func parseLevel(level string) zerolog.Level {
 	}
 }
 
+func addOperatorUriFlag(flags *pflag.FlagSet) {
+	flags.StringVarP(&operatorUri, "operator-uri", "", boundless.ManifestUrlLatest, "URL or path to the Boundless Operator manifest file")
+}
+
 func addBlueprintFileFlags(flags *pflag.FlagSet) {
-	// @todo ranyodh: remove deprecated`config` flag before 1.0.0
+	// @todo ranyodh: remove deprecated `config` flag before 1.0.0
 	flags.StringVarP(&blueprintFlag, "config", "c", DefaultBlueprintFileName, "Path to the blueprint file")
 	_ = flags.MarkDeprecated("config", "use --file (or -f)")
 
 	flags.StringVarP(&blueprintFlag, "file", "f", DefaultBlueprintFileName, "Path to the blueprint file")
-}
-
-func addCustomBOPFlag(flags *pflag.FlagSet) {
-	flags.StringVarP(&customBOPFlag, "bop", "b", "", "Path to the custom bop manifest")
 }
 
 func addKubeFlags(flags *pflag.FlagSet) {
