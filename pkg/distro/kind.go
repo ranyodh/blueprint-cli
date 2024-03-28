@@ -75,7 +75,7 @@ func (k *Kind) SetupClient() error {
 
 // Exists checks if kind exists
 func (k *Kind) Exists() (bool, error) {
-	err := utils.ExecCommandQuietly("bash", "-c", fmt.Sprintf("kind get clusters | grep %s", k.name))
+	err := utils.ExecCommandQuietly("bash", "-c", fmt.Sprintf("kind get clusters -q | grep -x %s", k.name))
 	if err != nil && strings.Contains(err.Error(), "exit status 1") {
 		return false, nil
 	}

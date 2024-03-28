@@ -31,6 +31,7 @@ func ExecCommandQuietly(name string, args ...string) error {
 	return nil
 }
 
+// ExecCommandWithReturn executes a command and returns the output as a string.
 func ExecCommandWithReturn(name string) (string, error) {
 	cmd := exec.Command("sh", "-c", name)
 	cmd.Stdin = os.Stdin
