@@ -11,7 +11,7 @@ require (
 	github.com/k0sproject/version v0.6.0
 	github.com/k3s-io/helm-controller v0.15.4
 	github.com/mattn/go-colorable v0.1.13
-	github.com/mirantiscontainers/blueprint-operator v1.0.16
+	github.com/mirantiscontainers/blueprint-operator v1.0.17
 	github.com/onsi/ginkgo/v2 v2.20.1
 	github.com/onsi/gomega v1.34.2
 	github.com/rs/zerolog v1.31.0
