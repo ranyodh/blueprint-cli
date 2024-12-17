@@ -9,7 +9,7 @@ require (
 	github.com/k0sproject/version v0.6.0
 	github.com/k3s-io/helm-controller v0.15.4
 	github.com/mattn/go-colorable v0.1.13
-	github.com/mirantiscontainers/blueprint-operator/api v0.0.0-20241125212229-e857ff3c69bb
+	github.com/mirantiscontainers/blueprint-operator/api v0.0.0-20241217173635-af331b13f9b1
 	github.com/onsi/ginkgo/v2 v2.21.0
 	github.com/onsi/gomega v1.35.1
 	github.com/rs/zerolog v1.31.0
