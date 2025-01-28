@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/mirantiscontainers/blueprint-cli/pkg/components"
@@ -13,6 +16,7 @@ import (
 	"github.com/mirantiscontainers/blueprint-cli/pkg/types"
 
 	"github.com/rs/zerolog/log"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
@@ -21,7 +25,7 @@ import (
 )
 
 // Apply installs the Blueprint Operator and applies the components defined in the blueprint
-func Apply(blueprint *types.Blueprint, kubeConfig *k8s.KubeConfig, providerInstallOnly bool) error {
+func Apply(blueprint *types.Blueprint, kubeConfig *k8s.KubeConfig, providerInstallOnly bool, imageRegistry string) error {
 	// Determine the distro
 	provider, err := distro.GetProvider(blueprint, kubeConfig)
 	if err != nil {
@@ -72,7 +76,7 @@ func Apply(blueprint *types.Blueprint, kubeConfig *k8s.KubeConfig, providerInsta
 	// For existing clusters, determine whether blueprint is currently installed
 	installOperator := true
 	if exists {
-		_, err := k8sclient.AppsV1().Deployments(constants.NamespaceBlueprint).Get(context.TODO(), constants.BlueprintOperatorDeployment, metav1.GetOptions{})
+		bopDeployment, err := k8sclient.AppsV1().Deployments(constants.NamespaceBlueprint).Get(context.TODO(), constants.BlueprintOperatorDeployment, metav1.GetOptions{})
 		if err != nil {
 			if !errors.IsNotFound(err) {
 				log.Warn().Msgf("Could not determine existing Blueprint Operator installation: %s", err)
@@ -80,16 +84,37 @@ func Apply(blueprint *types.Blueprint, kubeConfig *k8s.KubeConfig, providerInsta
 		} else {
 			// @todo: determine operator version
 			installOperator = false
+			deployedRegistry, err := detectDeployedRegistry(bopDeployment.Spec.Template.Spec.Containers)
+			if err != nil {
+				return fmt.Errorf("failed to detect image registry of the deployed bluepint operator: %w", err)
+			}
+			if imageRegistry == "" {
+				imageRegistry = deployedRegistry
+			} else if imageRegistry != deployedRegistry {
+				log.Warn().Msgf(
+					"The image registry of the deployed Blueprint Operator (%s) does not match the provided one (%s); "+
+						"the new registry will override the old one", deployedRegistry, imageRegistry,
+				)
+			}
 		}
-	}
-
-	uri, err := determineOperatorUri(blueprint.Spec.Version)
-	if err != nil {
-		return fmt.Errorf("failed to determine operator URI: %w", err)
 	}
 
 	// @todo: display the version of the operator
 	if installOperator {
+		uri, err := determineOperatorUri(blueprint.Spec.Version)
+		if err != nil {
+			return fmt.Errorf("failed to determine operator URI: %w", err)
+		}
+
+		var needCleanup bool
+		uri, needCleanup, err = setImageRegistry(uri, imageRegistry)
+		if err != nil {
+			return fmt.Errorf("failed to set image registry in BOP manifest: %w", err)
+		}
+		if needCleanup {
+			defer os.Remove(strings.TrimPrefix(uri, "file://"))
+		}
+
 		log.Info().Msg("Wait for networking pods to be up")
 		if err := k8s.WaitForPods(k8sclient, constants.NamespaceKubeSystem); err != nil {
 			return fmt.Errorf("failed to wait for pods in %s namespace: %w", constants.NamespaceKubeSystem, err)
@@ -169,4 +194,20 @@ func testClusterConnectivity(kubeConfig *k8s.KubeConfig) error {
 
 	log.Info().Msgf("Successfully connected to the Kubernetes API server.")
 	return nil
+}
+
+var bopImageRegex = regexp.MustCompile("(.*)/blueprint-operator:(.*)")
+
+func detectDeployedRegistry(containers []corev1.Container) (string, error) {
+	for _, container := range containers {
+		if bopImageRegex.MatchString(container.Image) {
+			matches := bopImageRegex.FindStringSubmatch(container.Image)
+			if len(matches) < 2 {
+				return "", fmt.Errorf("failed to extract registry from image %s", container.Image)
+			}
+			return matches[1], nil
+		}
+	}
+
+	return "", fmt.Errorf("unable to find Blueprint Operator container in the provided containers")
 }
