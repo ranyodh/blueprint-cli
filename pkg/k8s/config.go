@@ -41,10 +41,10 @@ func (c *KubeConfig) TryLoad() error {
 }
 
 func (c *KubeConfig) RESTConfig() (*restclient.Config, error) {
-	return c.clientConfig().ClientConfig()
+	return c.ClientConfig().ClientConfig()
 }
 
-func (c *KubeConfig) clientConfig() clientcmd.ClientConfig {
+func (c *KubeConfig) ClientConfig() clientcmd.ClientConfig {
 	return c.flags.ToRawKubeConfigLoader()
 }
 
@@ -55,7 +55,7 @@ func (c *KubeConfig) MergeConfig(newConfig clientcmdapi.Config) error {
 		return clientcmd.ModifyConfig(c.ConfigAccess(), newConfig, true)
 	}
 
-	existingConfig, err := c.clientConfig().RawConfig()
+	existingConfig, err := c.ClientConfig().RawConfig()
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (c *KubeConfig) MergeConfig(newConfig clientcmdapi.Config) error {
 
 // DelContext remove a given context from the configuration.
 func (c *KubeConfig) DelContext(n string) error {
-	cfg, err := c.clientConfig().RawConfig()
+	cfg, err := c.ClientConfig().RawConfig()
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *KubeConfig) CurrentContextName() (string, error) {
 	if isSet(c.flags.Context) {
 		return *c.flags.Context, nil
 	}
-	cfg, err := c.clientConfig().RawConfig()
+	cfg, err := c.ClientConfig().RawConfig()
 	if err != nil {
 		return "", err
 	}
@@ -109,7 +109,7 @@ func (c *KubeConfig) CurrentContextName() (string, error) {
 
 // GetContext fetch a given context or error if it does not exists.
 func (c *KubeConfig) GetContext(n string) (*clientcmdapi.Context, error) {
-	cfg, err := c.clientConfig().RawConfig()
+	cfg, err := c.ClientConfig().RawConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (c *KubeConfig) GetContext(n string) (*clientcmdapi.Context, error) {
 
 // ConfigAccess return the current kubeconfig api server access configuration.
 func (c *KubeConfig) ConfigAccess() clientcmd.ConfigAccess {
-	return c.clientConfig().ConfigAccess()
+	return c.ClientConfig().ConfigAccess()
 }
 
 func (c *KubeConfig) GetConfigPath() string {
