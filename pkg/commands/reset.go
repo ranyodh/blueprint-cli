@@ -8,7 +8,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/rs/zerolog/log"
 
-	"github.com/mirantiscontainers/blueprint-cli/pkg/components"
 	"github.com/mirantiscontainers/blueprint-cli/pkg/distro"
 	"github.com/mirantiscontainers/blueprint-cli/pkg/k8s"
 	"github.com/mirantiscontainers/blueprint-cli/pkg/types"
@@ -37,22 +36,22 @@ func Reset(blueprint *types.Blueprint, kubeConfig *k8s.KubeConfig, force bool) e
 	}
 
 	// Uninstall components
-	log.Info().Msgf("Reset Blueprint Operator resources")
-	err = components.RemoveComponents(provider.GetKubeConfig(), blueprint)
-	if err != nil {
-		return fmt.Errorf("failed to reset components: %w", err)
-	}
-
-	uri, err := determineOperatorUri(blueprint.Spec.Version)
-	if err != nil {
-		return fmt.Errorf("failed to determine operator URI: %w", err)
-	}
-
-	log.Info().Msgf("Uninstalling Blueprint Operator")
-	log.Debug().Msgf("Uninstalling blueprint operator using manifest file: %s", uri)
-	if err = k8s.DeleteYamlObjects(kubeConfig, uri); err != nil {
-		return fmt.Errorf("failed to uninstall Blueprint Operator: %w", err)
-	}
+	//log.Info().Msgf("Reset Blueprint Operator resources")
+	//err = components.RemoveComponents(provider.GetKubeConfig(), blueprint)
+	//if err != nil {
+	//	return fmt.Errorf("failed to reset components: %w", err)
+	//}
+	//
+	//uri, err := determineOperatorUri(blueprint.Spec.Version)
+	//if err != nil {
+	//	return fmt.Errorf("failed to determine operator URI: %w", err)
+	//}
+	//
+	//log.Info().Msgf("Uninstalling Blueprint Operator")
+	//log.Debug().Msgf("Uninstalling blueprint operator using manifest file: %s", uri)
+	//if err = k8s.DeleteYamlObjects(kubeConfig, uri); err != nil {
+	//	return fmt.Errorf("failed to uninstall Blueprint Operator: %w", err)
+	//}
 
 	// Reset the cluster
 	if err := provider.Reset(); err != nil {

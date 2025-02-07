@@ -1,15 +1,11 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 	"net"
-	"os"
 	"regexp"
-	"strings"
 	"time"
 
-	"github.com/mirantiscontainers/blueprint-cli/pkg/components"
 	"github.com/mirantiscontainers/blueprint-cli/pkg/constants"
 	"github.com/mirantiscontainers/blueprint-cli/pkg/distro"
 	"github.com/mirantiscontainers/blueprint-cli/pkg/k8s"
@@ -17,10 +13,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
@@ -65,99 +57,99 @@ func Apply(blueprint *types.Blueprint, kubeConfig *k8s.KubeConfig, providerInsta
 	}
 
 	// Setup the client
-	if err := provider.SetupClient(); err != nil {
-		return fmt.Errorf("failed to setup client: %w", err)
-	}
-	k8sclient, err := k8s.GetClient(kubeConfig)
-	if err != nil {
-		panic(err)
-	}
+	//if err := provider.SetupClient(); err != nil {
+	//	return fmt.Errorf("failed to setup client: %w", err)
+	//}
+	//k8sclient, err := k8s.GetClient(kubeConfig)
+	//if err != nil {
+	//	panic(err)
+	//}
 
-	// For existing clusters, determine whether blueprint is currently installed
-	installOperator := true
-	if exists {
-		bopDeployment, err := k8sclient.AppsV1().Deployments(constants.NamespaceBlueprint).Get(context.TODO(), constants.BlueprintOperatorDeployment, metav1.GetOptions{})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				log.Warn().Msgf("Could not determine existing Blueprint Operator installation: %s", err)
-			}
-		} else {
-			// @todo: determine operator version
-			installOperator = false
-			deployedRegistry, err := detectDeployedRegistry(bopDeployment.Spec.Template.Spec.Containers)
-			if err != nil {
-				return fmt.Errorf("failed to detect image registry of the deployed bluepint operator: %w", err)
-			}
-			if imageRegistry == "" {
-				imageRegistry = deployedRegistry
-			} else if imageRegistry != deployedRegistry {
-				log.Warn().Msgf(
-					"The image registry of the deployed Blueprint Operator (%s) does not match the provided one (%s); "+
-						"the new registry will override the old one", deployedRegistry, imageRegistry,
-				)
-			}
-		}
-	}
+	//// For existing clusters, determine whether blueprint is currently installed
+	//installOperator := true
+	//if exists {
+	//	bopDeployment, err := k8sclient.AppsV1().Deployments(constants.NamespaceBlueprint).Get(context.TODO(), constants.BlueprintOperatorDeployment, metav1.GetOptions{})
+	//	if err != nil {
+	//		if !errors.IsNotFound(err) {
+	//			log.Warn().Msgf("Could not determine existing Blueprint Operator installation: %s", err)
+	//		}
+	//	} else {
+	//		// @todo: determine operator version
+	//		installOperator = false
+	//		deployedRegistry, err := detectDeployedRegistry(bopDeployment.Spec.Template.Spec.Containers)
+	//		if err != nil {
+	//			return fmt.Errorf("failed to detect image registry of the deployed bluepint operator: %w", err)
+	//		}
+	//		if imageRegistry == "" {
+	//			imageRegistry = deployedRegistry
+	//		} else if imageRegistry != deployedRegistry {
+	//			log.Warn().Msgf(
+	//				"The image registry of the deployed Blueprint Operator (%s) does not match the provided one (%s); "+
+	//					"the new registry will override the old one", deployedRegistry, imageRegistry,
+	//			)
+	//		}
+	//	}
+	//}
+	//
+	//// @todo: display the version of the operator
+	//if installOperator {
+	//	uri, err := determineOperatorUri(blueprint.Spec.Version)
+	//	if err != nil {
+	//		return fmt.Errorf("failed to determine operator URI: %w", err)
+	//	}
+	//
+	//	var needCleanup bool
+	//	uri, needCleanup, err = setImageRegistry(uri, imageRegistry)
+	//	if err != nil {
+	//		return fmt.Errorf("failed to set image registry in BOP manifest: %w", err)
+	//	}
+	//	if needCleanup {
+	//		defer os.Remove(strings.TrimPrefix(uri, "file://"))
+	//	}
+	//
+	//	log.Info().Msg("Wait for networking pods to be up")
+	//	if err := k8s.WaitForPods(k8sclient, constants.NamespaceKubeSystem); err != nil {
+	//		return fmt.Errorf("failed to wait for pods in %s namespace: %w", constants.NamespaceKubeSystem, err)
+	//	}
+	//
+	//	// Check network connectivity
+	//	if err := testClusterConnectivity(kubeConfig); err != nil {
+	//		return fmt.Errorf("failed to test cluster connectivity: %w", err)
+	//	}
+	//
+	//	log.Info().Msgf("Installing Blueprint Operator")
+	//	log.Debug().Msgf("Installing Blueprint Operator using manifest file: %s", blueprint.Spec.Version)
+	//
+	//	var client kubernetes.Interface
+	//	var dynamicClient dynamic.Interface
+	//
+	//	if client, err = k8s.GetClient(kubeConfig); err != nil {
+	//		return fmt.Errorf("failed to get kubernetes client: %q", err)
+	//	}
+	//	if dynamicClient, err = k8s.GetDynamicClient(kubeConfig); err != nil {
+	//		return fmt.Errorf("failed to get kubernetes dynamic client: %q", err)
+	//	}
+	//
+	//	if err = k8s.ApplyYaml(client, dynamicClient, uri); err != nil {
+	//		return fmt.Errorf("failed to install Blueprint Operator: %w", err)
+	//	}
+	//} else {
+	//	log.Info().Msg("Blueprint Operator already installed")
+	//}
 
-	// @todo: display the version of the operator
-	if installOperator {
-		uri, err := determineOperatorUri(blueprint.Spec.Version)
-		if err != nil {
-			return fmt.Errorf("failed to determine operator URI: %w", err)
-		}
+	//// Wait for the pods to be ready
+	//if err := provider.WaitForPods(); err != nil {
+	//	return fmt.Errorf("failed to wait for pods: %w", err)
+	//}
 
-		var needCleanup bool
-		uri, needCleanup, err = setImageRegistry(uri, imageRegistry)
-		if err != nil {
-			return fmt.Errorf("failed to set image registry in BOP manifest: %w", err)
-		}
-		if needCleanup {
-			defer os.Remove(strings.TrimPrefix(uri, "file://"))
-		}
-
-		log.Info().Msg("Wait for networking pods to be up")
-		if err := k8s.WaitForPods(k8sclient, constants.NamespaceKubeSystem); err != nil {
-			return fmt.Errorf("failed to wait for pods in %s namespace: %w", constants.NamespaceKubeSystem, err)
-		}
-
-		// Check network connectivity
-		if err := testClusterConnectivity(kubeConfig); err != nil {
-			return fmt.Errorf("failed to test cluster connectivity: %w", err)
-		}
-
-		log.Info().Msgf("Installing Blueprint Operator")
-		log.Debug().Msgf("Installing Blueprint Operator using manifest file: %s", blueprint.Spec.Version)
-
-		var client kubernetes.Interface
-		var dynamicClient dynamic.Interface
-
-		if client, err = k8s.GetClient(kubeConfig); err != nil {
-			return fmt.Errorf("failed to get kubernetes client: %q", err)
-		}
-		if dynamicClient, err = k8s.GetDynamicClient(kubeConfig); err != nil {
-			return fmt.Errorf("failed to get kubernetes dynamic client: %q", err)
-		}
-
-		if err = k8s.ApplyYaml(client, dynamicClient, uri); err != nil {
-			return fmt.Errorf("failed to install Blueprint Operator: %w", err)
-		}
-	} else {
-		log.Info().Msg("Blueprint Operator already installed")
-	}
-
-	// Wait for the pods to be ready
-	if err := provider.WaitForPods(); err != nil {
-		return fmt.Errorf("failed to wait for pods: %w", err)
-	}
-
-	// install components
-	log.Info().Msgf("Applying Blueprint Operator resource")
-	err = components.ApplyBlueprint(kubeConfig, blueprint)
-	if err != nil {
-		return fmt.Errorf("failed to install components: %w", err)
-	}
-
-	log.Info().Msgf("Finished installing Blueprint Operator")
+	//// install components
+	//log.Info().Msgf("Applying Blueprint Operator resource")
+	//err = components.ApplyBlueprint(kubeConfig, blueprint)
+	//if err != nil {
+	//	return fmt.Errorf("failed to install components: %w", err)
+	//}
+	//
+	//log.Info().Msgf("Finished installing Blueprint Operator")
 
 	return nil
 }
